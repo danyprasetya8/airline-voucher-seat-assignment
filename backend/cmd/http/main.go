@@ -1,19 +1,39 @@
 package main
 
 import (
+	"airline-voucher-seat-assignment/app/http"
+	"airline-voucher-seat-assignment/app/http/handler"
+	"airline-voucher-seat-assignment/internal/config/database"
+	"airline-voucher-seat-assignment/internal/entity"
+	voucherRepo "airline-voucher-seat-assignment/internal/repository/voucher"
+	voucherService "airline-voucher-seat-assignment/internal/service/voucher"
 	"os"
 
-	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	logSetup()
 
-	if err := godotenv.Load(); err != nil {
+	db, err := database.New()
+
+	if err != nil {
 		log.Error(err.Error())
 		panic(err)
 	}
+
+	db.AutoMigrate(
+		&entity.Voucher{},
+	)
+
+	vr := voucherRepo.New(db)
+
+	vs := voucherService.New(vr)
+
+	h := handler.New(vs)
+
+	s := http.NewServer(h)
+	s.Run()
 }
 
 func logSetup() {
