@@ -34,6 +34,7 @@ func (a *VoucherRepository) Count() (count int64) {
 }
 
 func (a *VoucherRepository) GetList(page, size int) (vouchers []entity.Voucher) {
+	vouchers = make([]entity.Voucher, 0)
 	a.db.Limit(size).
 		Offset((page - 1) * size).
 		Find(&vouchers)
