@@ -12,6 +12,8 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import { checkVoucher, generateVoucher } from '@/api/voucher'
 import { toast } from 'sonner'
+import axios from 'axios'
+import type { ErrorResponse } from '@/interface/response'
 
 const AIRCRAFT_TYPES = ['ATR', 'Airbus 320', 'Boeing 737 Max']
 
@@ -31,12 +33,12 @@ function App() {
         flightNumber
       })
 
-      if (checkRes?.exists) {
+      if (checkRes?.data.exists) {
         toast.error(('voucher already exist'))
         return
       }
 
-      const { data: { seats, success } } = await generateVoucher({
+      const { data: generateRes } = await generateVoucher({
         id: crewId,
         name: crewName,
         flightNumber,
@@ -44,15 +46,21 @@ function App() {
         aircraft: aircraftType
       })
 
-      if (!success) {
+      if (!generateRes.data.success) {
         toast.error('failed to generate voucher')
         return
       }
 
-      toast.success('Voucher created on seats: ' + seats.join(', '))
+      toast.success('Voucher created on seats: ' + generateRes.data.seats.join(', '))
 
     } catch(err) {
-      toast.error(err as string)
+      if (axios.isAxiosError<ErrorResponse>(err)) {
+        toast.error(err.response?.data.error)
+      } else if (err instanceof Error) {
+        toast.error(err.message)
+      } else {
+        toast.error('Something went wrong')
+      }
     }
   }
 

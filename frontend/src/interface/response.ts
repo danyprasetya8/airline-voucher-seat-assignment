@@ -1,7 +1,12 @@
+export interface ErrorResponse {
+  code: number
+  message: string
+  error: string
+}
+
 export interface BaseResponse<T> {
   code: number
   message: string
-  error?: string
   data: T
   pagination?: Pagination
 }
