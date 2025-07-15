@@ -13,27 +13,27 @@ type IVoucherRepository interface {
 	Create(voucher *entity.Voucher) error
 }
 
-type VoucherRepository struct {
+type voucherRepository struct {
 	db *gorm.DB
 }
 
 func New(db *gorm.DB) IVoucherRepository {
-	return &VoucherRepository{db}
+	return &voucherRepository{db}
 }
 
-func (a *VoucherRepository) GetByFlightNumberAndDate(flightNumber, flightDate string) (voucher *entity.Voucher) {
+func (a *voucherRepository) GetByFlightNumberAndDate(flightNumber, flightDate string) (voucher *entity.Voucher) {
 	a.db.Where("flightNumber = ?", flightNumber).
 		Where("flightDate = ?", flightDate).
 		First(voucher)
 	return
 }
 
-func (a *VoucherRepository) Count() (count int64) {
+func (a *voucherRepository) Count() (count int64) {
 	a.db.Model(&entity.Voucher{}).Count(&count)
 	return
 }
 
-func (a *VoucherRepository) GetList(page, size int) (vouchers []entity.Voucher) {
+func (a *voucherRepository) GetList(page, size int) (vouchers []entity.Voucher) {
 	vouchers = make([]entity.Voucher, 0)
 	a.db.Limit(size).
 		Offset((page - 1) * size).
@@ -41,6 +41,6 @@ func (a *VoucherRepository) GetList(page, size int) (vouchers []entity.Voucher) 
 	return
 }
 
-func (a *VoucherRepository) Create(voucher *entity.Voucher) error {
+func (a *voucherRepository) Create(voucher *entity.Voucher) error {
 	return a.db.Create(voucher).Error
 }

@@ -2,7 +2,7 @@ package constant
 
 import "airline-voucher-seat-assignment/pkg/model"
 
-var AircraftTypes = []model.AircraftType{
+var AircraftTypes = []*model.AircraftType{
 	{
 		Name:      "ATR",
 		RowStart:  1,

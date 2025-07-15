@@ -18,13 +18,17 @@ func main() {
 	db, err := database.New()
 
 	if err != nil {
-		log.Error(err.Error())
+		log.Errorf("failed to start database: %s", err.Error())
 		panic(err)
 	}
 
-	db.AutoMigrate(
+	err = db.AutoMigrate(
 		&entity.Voucher{},
 	)
+
+	if err != nil {
+		log.Errorf("failed auto migrate table: %s", err.Error())
+	}
 
 	vr := voucherRepo.New(db)
 

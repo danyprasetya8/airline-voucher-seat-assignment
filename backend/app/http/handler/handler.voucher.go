@@ -30,7 +30,7 @@ func (h *Handler) GetVoucherList(c *gin.Context) {
 
 	vouchers, pageRes := h.voucherService.GetList(pagination)
 
-	responsehelper.SuccessPage(c, vouchers, &pageRes)
+	responsehelper.SuccessPage(c, vouchers, pageRes)
 }
 
 // CheckVoucher
@@ -50,12 +50,7 @@ func (h *Handler) CheckVoucher(c *gin.Context) {
 		return
 	}
 
-	res, err := h.voucherService.Check(body)
-
-	if err != nil {
-		responsehelper.BadRequest(c, err.Error())
-		return
-	}
+	res := h.voucherService.Check(body)
 
 	responsehelper.Success(c, res)
 }

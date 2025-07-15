@@ -11,15 +11,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type server struct {
+type Server struct {
 	handler *handler.Handler
 }
 
-func NewServer(handler *handler.Handler) *server {
-	return &server{handler}
+func NewServer(handler *handler.Handler) *Server {
+	return &Server{handler}
 }
 
-func (s *server) Run() {
+func (s *Server) Run() {
 	r := gin.Default()
 
 	api := r.Group("/api")
@@ -30,12 +30,12 @@ func (s *server) Run() {
 	r.Run()
 }
 
-func (s *server) v1Route(api *gin.RouterGroup) {
+func (s *Server) v1Route(api *gin.RouterGroup) {
 	v1 := api.Group("/v1")
 	s.voucherRoute(v1)
 }
 
-func (s *server) voucherRoute(v1Group *gin.RouterGroup) {
+func (s *Server) voucherRoute(v1Group *gin.RouterGroup) {
 	voucher := v1Group.Group("/voucher")
 	voucher.GET("/", s.handler.GetVoucherList)
 	voucher.POST("/check", s.handler.CheckVoucher)
