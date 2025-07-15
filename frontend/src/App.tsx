@@ -11,6 +11,7 @@ import {
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { checkVoucher, generateVoucher } from '@/api/voucher'
+import { toast } from 'sonner'
 
 const AIRCRAFT_TYPES = ['ATR', 'Airbus 320', 'Boeing 737 Max']
 
@@ -25,13 +26,13 @@ function App() {
     e.preventDefault()
 
     try {
-      const { data: { exists } } = await checkVoucher({
+      const { data: checkRes } = await checkVoucher({
         date: date ? format(date, 'yyyy-MM-dd') : '',
         flightNumber
       })
 
-      if (exists) {
-        window.alert('voucher already exist')
+      if (checkRes?.exists) {
+        toast.error(('voucher already exist'))
         return
       }
 
@@ -44,14 +45,14 @@ function App() {
       })
 
       if (!success) {
-        window.alert('failed to generate voucher')
+        toast.error('failed to generate voucher')
         return
       }
 
-      window.alert('success: ' + seats.join(','))
+      toast.success('Voucher created on seats: ' + seats.join(', '))
 
     } catch(err) {
-      console.error(err)
+      toast.error(err as string)
     }
   }
 
