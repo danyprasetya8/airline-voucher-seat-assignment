@@ -7,7 +7,7 @@ import (
 )
 
 type IVoucherRepository interface {
-	GetByFlightNumberAndDate(flightNumber, flightDate string) *entity.Voucher
+	GetByFlightNumberAndDate(flightNumber, flightDate string) (voucher entity.Voucher)
 	Count() int64
 	GetList(page, size int) []entity.Voucher
 	Create(voucher *entity.Voucher) error
@@ -21,10 +21,10 @@ func New(db *gorm.DB) IVoucherRepository {
 	return &voucherRepository{db}
 }
 
-func (a *voucherRepository) GetByFlightNumberAndDate(flightNumber, flightDate string) (voucher *entity.Voucher) {
-	a.db.Where("flightNumber = ?", flightNumber).
-		Where("flightDate = ?", flightDate).
-		First(voucher)
+func (a *voucherRepository) GetByFlightNumberAndDate(flightNumber, flightDate string) (voucher entity.Voucher) {
+	a.db.Where("flight_number = ?", flightNumber).
+		Where("flight_date = ?", flightDate).
+		First(&voucher)
 	return
 }
 

@@ -10,11 +10,12 @@ import (
 	"airline-voucher-seat-assignment/pkg/model/response"
 	"airline-voucher-seat-assignment/pkg/responsehelper"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type IVoucherService interface {
@@ -62,14 +63,14 @@ func (v *voucherService) GetList(pageReq request.Pagination) (vouchers []respons
 func (v *voucherService) Check(req request.CheckVoucher) (res *response.CheckVoucher) {
 	voucher := v.voucherRepo.GetByFlightNumberAndDate(req.FlightNumber, req.Date)
 	return &response.CheckVoucher{
-		Exists: voucher != nil,
+		Exists: voucher.ID != 0,
 	}
 }
 
 func (v *voucherService) Generate(req request.GenerateVoucher) (res *response.GenerateVoucher, err error) {
 	existVoucher := v.voucherRepo.GetByFlightNumberAndDate(req.FlightNumber, req.Date)
 
-	if existVoucher != nil {
+	if existVoucher.ID != 0 {
 		log.Errorf("flight number %s already generate voucher at %s", req.FlightNumber, req.Date)
 		return nil, fmt.Errorf("flight number %s already generate voucher at %s", req.FlightNumber, req.Date)
 	}

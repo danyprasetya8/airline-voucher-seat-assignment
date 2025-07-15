@@ -51,7 +51,7 @@ function App() {
         <div />
 
         <Button
-          className="col-span-2"
+          className="col-span-2 cursor-pointer"
           type="submit"
         >
           Generate
