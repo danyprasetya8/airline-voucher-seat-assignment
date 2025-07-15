@@ -1,9 +1,15 @@
 FROM node:22.17
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
+
+COPY frontend/pnpm-lock.yaml frontend/package.json ./
+
+RUN pnpm install --frozen-lockfile
 
 COPY frontend/. .
 
-RUN npm install --legacy-peer-deps
+EXPOSE 5173
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "dev"]

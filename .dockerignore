@@ -1,3 +1,6 @@
 backend/data/
 frontend/node_modules
 *.log
+.vite
+node_modules
+dist
