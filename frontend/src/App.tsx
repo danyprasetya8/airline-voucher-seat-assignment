@@ -1,7 +1,59 @@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import DatePicker from '@/components/DatePicker'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { useState } from 'react'
+import { format } from 'date-fns'
+import { checkVoucher, generateVoucher } from '@/api/voucher'
+
+const AIRCRAFT_TYPES = ['ATR', 'Airbus 320', 'Boeing 737 Max']
 
 function App() {
+  const [date, setDate] = useState<Date | undefined>()
+  const [aircraftType, setAircraftType] = useState<string | undefined>()
+  const [crewId, setCrewId] = useState<string | undefined>()
+  const [crewName, setCrewName] = useState<string | undefined>()
+  const [flightNumber, setFlightNumber] = useState<string | undefined>()
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    try {
+      const { data: { exists } } = await checkVoucher({
+        date: date ? format(date, 'yyyy-MM-dd') : '',
+        flightNumber
+      })
+
+      if (exists) {
+        window.alert('voucher already exist')
+        return
+      }
+
+      const { data: { seats, success } } = await generateVoucher({
+        id: crewId,
+        name: crewName,
+        flightNumber,
+        date: date ? format(date, 'yyyy-MM-dd') : '',
+        aircraft: aircraftType
+      })
+
+      if (!success) {
+        window.alert('failed to generate voucher')
+        return
+      }
+
+      window.alert('success: ' + seats.join(','))
+
+    } catch(err) {
+      console.error(err)
+    }
+  }
 
   return (
     <div className="w-1/3 mx-auto my-30">
@@ -10,42 +62,69 @@ function App() {
       </div>
 
       <form
-        action=""
+        onSubmit={submit}
         className="grid grid-cols-2 gap-8"
       >
         <div>
           <div className="mb-2">
             Crew ID
           </div>
-          <Input placeholder="Input crew id" />
+          <Input
+            placeholder="Input crew id"
+            onChange={e => setCrewId(e.target.value)}
+          />
         </div>
 
         <div>
           <div className="mb-2">
             Crew Name
           </div>
-          <Input placeholder="Input crew name" />
+          <Input
+            placeholder="Input crew name"
+            onChange={e => setCrewName(e.target.value)}
+          />
         </div>
 
         <div>
           <div className="mb-2">
             Flight Number
           </div>
-          <Input placeholder="Input flight number" />
+          <Input
+            placeholder="Input flight number"
+            onChange={e => setFlightNumber(e.target.value)}
+          />
         </div>
 
         <div>
           <div className="mb-2">
             Flight Date
           </div>
-          <Input placeholder="Input flight date" />
+          <DatePicker
+            date={date}
+            onSelectDate={d => setDate(d)}
+          />
         </div>
 
         <div>
           <div className="mb-2">
             Aircraft Type
           </div>
-          <Input placeholder="" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full text-left justify-start font-normal">
+                {aircraftType ? aircraftType : 'Choose'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="start">
+              <DropdownMenuGroup>
+                {AIRCRAFT_TYPES.map(at => (
+                  <DropdownMenuItem key={at} onClick={() => setAircraftType(at)}>
+                    {at}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div />
